@@ -58,7 +58,7 @@ void Parking::startClient()
     discoveryAgent->start(QBluetoothServiceDiscoveryAgent::FullDiscovery);
     qDebug() << "start";
     //! [Searching for the service]
-    setMessage(QStringLiteral("Starting server discovery. You are the right player"));
+    setMessage(QStringLiteral("Starting server discovery."));
 }
 
 void Parking::done()
