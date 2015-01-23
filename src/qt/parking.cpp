@@ -71,6 +71,7 @@ void Parking::done()
 void Parking::addService(const QBluetoothServiceInfo &service)
 {
     setMessage("Service found. Setting parameters...");
+
     //! [Connecting the socket]
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     socket->connectToService(service);
@@ -91,4 +92,24 @@ void Parking::serverDisconnected()
 {
     setMessage("Server Disconnected");
     m_timer->stop();
+}
+
+void Parking::readSocket()
+{
+    if (!socket)
+        return;
+
+    const char sep = ' ';
+    QByteArray line;
+    while (socket->canReadLine()) {
+        line = socket->readLine();
+        qDebug() << QString::fromUtf8(line.constData(), line.length());
+        if (line.contains("result")) {
+            QList<QByteArray> result = line.split(sep);
+            if (result.size() > 2) {
+                QByteArray leftSide = result.at(1);
+                QByteArray rightSide = result.at(2);
+            }
+        }
+    }
 }

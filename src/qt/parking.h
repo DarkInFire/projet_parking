@@ -31,6 +31,7 @@ public slots:
     void done();
     void addService(const QBluetoothServiceInfo &);
     void serverDisconnected();
+    void readSocket();
 
 Q_SIGNALS:
     void messageChanged();
