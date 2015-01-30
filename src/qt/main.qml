@@ -5,15 +5,18 @@ import QtQuick.Dialogs 1.2
 
 ApplicationWindow {
     title: qsTr("Hello World")
-    width: 320
-    height: 480
     visible: true
+    height: 1280
+    width: 720
 
     Text {
         id: nbrePlacesDisponibles
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
-        font.pixelSize: 78
+        x: parent.width / 2 -200
+        y: 100
+
+        font.pixelSize: 150
         property string places: parking.places
         onPlacesChanged: {
             nbrePlacesDisponibles.text = places;

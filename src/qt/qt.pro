@@ -1,9 +1,10 @@
 TEMPLATE = app
 
-QT += qml quick widgets bluetooth
+QT += qml quick widgets bluetooth core androidextras
 
 SOURCES += main.cpp \
-    parking.cpp
+    parking.cpp \
+    androidrfcomm.cpp
 
 RESOURCES += qml.qrc
 
@@ -14,4 +15,14 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    parking.h
+    parking.h \
+    androidrfcomm.h
+
+CONFIG += mobility
+
+MOBILITY =
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+OTHER_FILES += android/AndroidManifest.xml
+

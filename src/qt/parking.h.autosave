@@ -26,6 +26,7 @@ public slots:
     void updateNbre();
     void setMessage(const QString &Message);
     QString updateNbreFromBt();
+    void readData();
 
 Q_SIGNALS:
     void messageChanged();

@@ -6,22 +6,12 @@ Parking::Parking(QObject *parent) : QObject(parent)
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateNbre()));
     m_timer->start(1000);
     qDebug() << "Parking initialisé";
-/*
-    rfcomm = new AndroidRfComm();
-
-    if (rfcomm->isEnabled()) {
-        rfcomm->connect("arduino_parking");
-        if (rfcomm->isConnected()) {
-            rfcomm->sendLine("a");
-            QString received=rfcomm->receiveLine(200, 100);
-            qDebug() << received;
-        }
-    }*/
-
+    
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     qDebug() << "Socket créé";
     socket->connectToService(QBluetoothAddress("00:13:EF:00:06:4F"), QBluetoothUuid(serviceUuid), QIODevice::ReadWrite);
     qDebug() << "Tentative de connection";
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
 }
 
 Parking::~Parking()
@@ -30,15 +20,15 @@ Parking::~Parking()
     qDebug() << "Destructeur";
 }
 
-QString Parking::updateNbreFromBt()
+QString Parking::readData()
 {
-    /*rfcomm->sendLine("a");
-    QString received=rfcomm->receiveLine(200, 100);
-    qDebug() << received;*/
-    QString received = "";
+    if (!socket)
+        return;
 
-
-    return received;
+    while (socket->canReadLine()) {
+        QByteArray line = socket->readLine();
+        emit messageReceived(QString::fromUtf8(line.constData(), line.length()));
+    }
 }
 
 void Parking::updateNbre()
