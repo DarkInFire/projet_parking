@@ -4,7 +4,6 @@ QT += qml quick widgets bluetooth core androidextras
 
 SOURCES += main.cpp \
     parking.cpp \
-    androidrfcomm.cpp
 
 RESOURCES += qml.qrc
 
@@ -15,8 +14,7 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    parking.h \
-    androidrfcomm.h
+    parking.h
 
 CONFIG += mobility
 

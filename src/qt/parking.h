@@ -6,7 +6,6 @@
 #include <QTimer>
 #include <QDebug>
 #include <QBluetoothSocket>
-#include "androidrfcomm.h"
 
 static const QString serviceUuid(QStringLiteral("00001101-0000-1000-8000-00805F9B34FB"));
 
@@ -25,7 +24,10 @@ public:
 public slots:
     void updateNbre();
     void setMessage(const QString &Message);
-    QString updateNbreFromBt();
+    void cmdRecv();
+
+    //Bluetooth slots
+    void connectionEtablished();
 
 Q_SIGNALS:
     void messageChanged();

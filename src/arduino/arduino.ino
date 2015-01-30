@@ -25,8 +25,8 @@ void loop()
       if (recvChar == 'a')
       {
         int nbre = random(1, 20);
-        Serial.print(nbre);
-        blueToothSerial.print(nbre);
+        Serial.println(nbre);
+        blueToothSerial.println(nbre);
       }
     }
     if(Serial.available()){//check if there's any data sent from the local serial terminal, you can add the other applications here
