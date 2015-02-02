@@ -4,59 +4,28 @@ Parking::Parking(QObject *parent) : QObject(parent)
 {
     m_timer = new QTimer(this);
 
-    socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
-        socket->connectToService(QBluetoothAddress("00:13:EF:00:06:4F"), QBluetoothUuid(serviceUuid), QIODevice::ReadWrite);
-        connect(socket, SIGNAL(connected()), this, SLOT(connectionEtablished()));
-
-    qDebug() << "Parking initialisé";
+    communication = new Communication(this, QBluetoothAddress("00:13:EF:00:06:4F"));
+    connect(communication, SIGNAL(connectedToParking()), this, SLOT(connectedToParking()));
 }
 
 Parking::~Parking()
 {
 
-    qDebug() << "Destructeur";
 }
 
-void Parking::connectionEtablished()
+void Parking::connectedToParking()
 {
     m_timer->start(1000);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateNbre()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(cmdRecv()));
+
 }
 
-void Parking::cmdRecv()
+void updateNbre()
 {
-    if (!socket)
-        return;
 
-    while (socket->canReadLine()) {
-        QByteArray line = socket->readLine();
-        m_nbrePlaces = line;
-        Q_EMIT messageChanged();
-
-    }
 }
 
-void Parking::updateNbre()
-{
-    QByteArray target;
-    QDataStream s(&target, QIODevice::ReadWrite);
-    const char valeur = 'a';
-    s << valeur;
-    socket->write(target);
-    //Q_EMIT messageChanged();
-    qDebug() << "Envoie de A sur l'arduino";
-}
-
-void Parking::setMessage(const QString &Message)
-{
-    m_nbrePlaces = Message;
-    Q_EMIT messageChanged();
-    qDebug() << "setMessage";
-}
-
-QString Parking::nbrePlaces()
+QString Parking::getNbrePlaces()
 {
     return m_nbrePlaces;
 }
-

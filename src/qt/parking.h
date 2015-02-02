@@ -5,38 +5,31 @@
 #include <QString>
 #include <QTimer>
 #include <QDebug>
-#include <QBluetoothSocket>
-
-static const QString serviceUuid(QStringLiteral("00001101-0000-1000-8000-00805F9B34FB"));
+#include "communication.h"
 
 class Parking : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString places READ nbrePlaces NOTIFY messageChanged)
+    Q_PROPERTY(QString places READ getNbrePlaces NOTIFY nbrePlacesChanged)
 
 public:
     explicit Parking(QObject *parent = 0);
     ~Parking();
-    int randNbre(int low, int high);
-    QString nbrePlaces();
 
+    QString getNbrePlaces();
 
 public slots:
     void updateNbre();
-    void setMessage(const QString &Message);
-    void cmdRecv();
-
-    //Bluetooth slots
-    void connectionEtablished();
+    void connectedToParking();
 
 Q_SIGNALS:
-    void messageChanged();
+    void nbrePlacesChanged();
 
 private:
     QTimer *m_timer;
     QString m_nbrePlaces;
-    //AndroidRfComm *rfcomm;
-    QBluetoothSocket *socket;
+
+    Communication *communication;
 };
 
 #endif // PARKING_H
