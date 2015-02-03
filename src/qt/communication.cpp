@@ -9,7 +9,7 @@ Communication::Communication(QObject *parent, QBluetoothAddress parkingComAddres
 
 Communication::~Communication()
 {
-
+    socket->close();
 }
 
 void Communication::connectionEtablished()
@@ -19,11 +19,12 @@ void Communication::connectionEtablished()
 
 void Communication::sendCmd(const int cmd, QByteArray &data)
 {
-    QByteArray target;
-    QDataStream s(&target, QIODevice::ReadWrite);
+    QByteArray command;
+    QDataStream s(&command, QIODevice::ReadWrite);
     s << cmd;
-    s << data;
-    socket->write(target);
+    socket->write(command);
+
+    socket->write(data);
 }
 
 void Communication::dataReceived()
@@ -34,15 +35,11 @@ void Communication::dataReceived()
     if (socket->bytesAvailable() < 1)
         return;
 
-    qint8 command = socket->read(1);
 
-    switch(dataPacket.data[CMD])
-    {
 
-    }
 }
 
-void Communication::hdlCmd(const int cmd, QByteArray &data)
+void Communication::getCmd(const int cmd, QByteArray &data)
 {
 
 }
