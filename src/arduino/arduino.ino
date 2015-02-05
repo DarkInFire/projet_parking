@@ -1,10 +1,8 @@
 #include <SoftwareSerial.h>   //Software Serial Port
-#define RxD 6
-#define TxD 7
- 
+#include "utilisateur.h"
 #define DEBUG_ENABLED  1
 
-//Enumération des commandes recevables
+//liste des messages du protocole de communication
 enum COMMANDS {
   cmd_getNbrPlacesDispo = 0
 };
@@ -13,33 +11,32 @@ enum MESSAGES {
   msg_NbrPlacesDispo = 0
 };
 
-const int BUFFER_LIMIT = 4; // Buffer de 4 octets (1 cmd, 3 data)
-
 //Enumération du packet reçu
 enum PACKET_DETAILS{
   CMD = 0,
-  BYTE_1,
-  BYTE_2,
+  TOKEN,
+  CRC
   BYTE_3
 };
 
 struct
 {
-  byte data[BUFFER_LIMIT]; //Données reçues
+  byte data[]; //Données reçues
   byte curLoc; //compteur
 } dataPacket; 
 
 unsigned long lastTimerHit;
 
 const int baudRate = 9600;
- 
-SoftwareSerial bluetoothSerial(RxD,TxD);
 
 bool correctPacket = false;
 
 uint8_t nbrPlacesDispo;
-
-char Message[32] = 
+ 
+//Définition de la com Bt sur les ports 6 et 7
+#define RxD 6
+#define TxD 7
+SoftwareSerial bluetoothSerial(RxD,TxD);
 
 void setup() 
 { 
@@ -74,7 +71,7 @@ void checkAndroidCommand()
   
   lastTimerHit = millis(); //MaJ du timer de timeout
   
-  dataPacket.data[dataPacket.curLoc] = bluetoothSerial.read();
+  dataPacket.data[] = bluetoothSerial.read();
   
   dataPacket.curLoc++; // Incrémentation du compteur
   
