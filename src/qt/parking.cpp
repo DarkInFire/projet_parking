@@ -15,13 +15,15 @@ Parking::~Parking()
 
 void Parking::connectedToParking()
 {
-    m_timer->start(1000);
+    m_timer->start(2500);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(updateNbre()));
+    qDebug() << "connectedToParking";
 }
 
 void Parking::updateNbre()
 {
-
+    qDebug() << "Parking::updateNbre()";
+    communication->sendCmd(cmd_getNbrPlacesDispo);
 }
 
 QString Parking::getNbrePlaces()

@@ -3,37 +3,13 @@
 
 #include <QObject>
 #include <QBluetoothSocket>
+#include <QByteArray>
+#include <QDataStream>
+#include <QDebug>
 
 //Définie les valeurs du service Bluetooth
 static const QString serviceUuid(QStringLiteral("00001101-0000-1000-8000-00805F9B34FB"));
 
-const int BUFFER_LIMIT = 4; //Limite du buffer
-
-//Liste des messages recevables par la tablette
-enum msg_tablet
-{
-    nbrPlacesDisponibles = 0 //Nombre de places disponibles
-};
-
-//Liste des commandes utilisables par l'arduino
-enum cmd_arduino
-{
-    getNbrePlacesDisponibles = 0 //Demande du nombre de places disponibles
-};
-
-//Définition du paquet
-enum PACKET_DETAILS{
-    CMD = 0,
-    BYTE_1,
-    BYTE_2,
-    BYTE_3,
-};
-
-struct
-{
-    quint8 data[BUFFER_LIMIT];
-    quint8 curLoc;
-} dataPacket;
 
 /*
  * Classe communication
@@ -50,8 +26,8 @@ signals:
 
 public slots:
     //Envoie/Réception de données
-    void sendCmd(const int cmd, QByteArray &data);
-    void getCmd (const int cmd, QByteArray &data);
+    void sendCmd(const quint8 cmd, const quint8 &data);
+    void sendCmd(const quint8 cmd);
 
     //Slots Bluetooth
     void connectionEtablished();
@@ -63,6 +39,9 @@ signals:
 private:
     QBluetoothSocket *socket;
     QBluetoothAddress parkingComAdress;
+    QDataStream *stream;
+    quint8 token;
+    bool correctPacket;
 };
 
 #endif // COMMUNICATION_H

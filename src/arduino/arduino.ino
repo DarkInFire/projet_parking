@@ -1,29 +1,11 @@
 #include <SoftwareSerial.h>   //Software Serial Port
 #include "utilisateur.h"
+
 #define DEBUG_ENABLED  1
+#define RxD 6
+#define TxD 7
 
-//liste des messages du protocole de communication
-enum COMMANDS {
-  cmd_getNbrPlacesDispo = 0
-};
-
-enum MESSAGES {
-  msg_NbrPlacesDispo = 0
-};
-
-//Enumération du packet reçu
-enum PACKET_DETAILS{
-  CMD = 0,
-  TOKEN,
-  CRC
-  BYTE_3
-};
-
-struct
-{
-  byte data[]; //Données reçues
-  byte curLoc; //compteur
-} dataPacket; 
+SoftwareSerial bluetoothSerial(RxD,TxD);
 
 unsigned long lastTimerHit;
 
@@ -31,12 +13,38 @@ const int baudRate = 9600;
 
 bool correctPacket = false;
 
-uint8_t nbrPlacesDispo;
- 
-//Définition de la com Bt sur les ports 6 et 7
-#define RxD 6
-#define TxD 7
-SoftwareSerial bluetoothSerial(RxD,TxD);
+const int BUFFER_LIMIT = 4;
+
+byte nbrPlacesDispo;
+
+//Variables nécessaires à la communication Android;
+byte androidToken;
+bool androidConnected = true;
+byte transmissionBytes[4];
+
+//liste des messages du protocole de communication
+enum COMMANDS {
+  cmd_getNbrPlacesDispo = 1,
+};
+
+enum MESSAGES {
+  msg_NbrPlacesDispo = 1,
+};
+
+//Enumération du packet reçu
+enum PACKET_DETAILS{
+  CMD = 0,
+  TOKEN,
+  DATA_1,
+  DATA_2,
+};
+
+struct
+{
+  byte data[BUFFER_LIMIT]; //Données reçues
+  byte curLoc; //compteur
+} 
+dataPacket; 
 
 void setup() 
 { 
@@ -44,17 +52,20 @@ void setup()
   pinMode(RxD, INPUT);
   pinMode(TxD, OUTPUT);
   setupBluetoothConnection();
-  
+
   lastTimerHit = 0;
   dataPacket.curLoc = 0;
-  
+
   nbrPlacesDispo = 5;
+
+  androidToken = B10010;
 } 
- 
+
 void loop() 
-{ 
+{
   if(bluetoothSerial.available() > 0)
   {
+    Serial.println("Bluetooth Data available");
     checkAndroidCommand();
   }
 }
@@ -68,51 +79,68 @@ void checkAndroidCommand()
     correctPacket = false;
     Serial.println("Timeout");
   }
-  
+
   lastTimerHit = millis(); //MaJ du timer de timeout
-  
-  dataPacket.data[] = bluetoothSerial.read();
-  
+
+  dataPacket.data[dataPacket.curLoc] = bluetoothSerial.read();
+
   dataPacket.curLoc++; // Incrémentation du compteur
-  
+
   if ( dataPacket.curLoc == BUFFER_LIMIT )
   { 
     correctPacket = true;
     dataPacket.curLoc = 0;
-    
+
+    Serial.println("---RECEPTION d'UNE COMMANDE");
+    Serial.print("ID commande: ");
+    Serial.println(dataPacket.data[CMD]);
+    Serial.print("Token: ");
+    Serial.println(dataPacket.data[TOKEN]);
+    Serial.print("Message1: ");
+    Serial.println(dataPacket.data[DATA_1]);
+    Serial.print("Message2: ");
+    Serial.println(dataPacket.data[DATA_2]);
+
     switch ( dataPacket.data[CMD] )
     {
-      case cmd_getNbrPlacesDispo:
-        sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo);
-        Serial.println();
+    case cmd_getNbrPlacesDispo:
+      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
+
       break;
-      
-      default:
-        //Si la commande est incorrecte
-        correctPacket = false;
-        dataPacket.curLoc = 0;
-        Serial.println("invalid cmd");
+
+    default:
+      //Si la commande est incorrecte
+      correctPacket = false;
+      dataPacket.curLoc = 0;
+      Serial.println("invalid cmd");
       break;
     }
-    
+
     if (correctPacket == true )
     {
-      Serial.print("z\n");
+      Serial.print("Paquet OK\n");
       correctPacket = false;
     }
   }
 }
 
-void sendMessage(const uint8_t messageId, const uint32_t message)
+void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t message2)
 {
-  Message = String(messageId);
-  bluetoothSerial.print(msgId);
-  Serial.print(msgId);
-  
-  String msg;
-  msgId = String(message);
-  bluetoothSerial.print(msg);
-  Serial.print(message);
+  if (!androidConnected)
+    return;
+  Serial.println("---ENVOI D'UN MESSAGE");
+  bluetoothSerial.print(messageId);
+  Serial.print("ID Message: ");
+  Serial.println(messageId);
+  bluetoothSerial.print(androidToken);
+  Serial.print("Token: ");
+  Serial.println(androidToken);
+  bluetoothSerial.print(message1);
+  Serial.print("Message1: ");
+  Serial.println(message1);
+  bluetoothSerial.print(message2);
+  Serial.print("Message2: ");
+  Serial.println(message2);
 }
 
 void setupBluetoothConnection()

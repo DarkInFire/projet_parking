@@ -7,6 +7,18 @@
 #include <QDebug>
 #include "communication.h"
 
+//Liste des messages recevables par la tablette
+enum msg_tablet
+{
+    msg_nbrPlacesDispo = 1, //Nombre de places disponibles
+};
+
+//Liste des commandes utilisables par l'arduino
+enum cmd_arduino
+{
+    cmd_getNbrPlacesDispo = 1, //Demande du nombre de places disponibles
+};
+
 class Parking : public QObject
 {
     Q_OBJECT
