@@ -6,7 +6,7 @@ Parking::Parking(QObject *parent) : QObject(parent)
 
     communication = new Communication(this, QBluetoothAddress("00:13:EF:01:11:8B"));
     connect(communication, SIGNAL(connectedToParking()), this, SLOT(connectedToParking()));
-    connect(communication, SIGNAL(cmdReceived(quint8,quint8,quint8)), this, SLOT(getCmd(int,quint8,quint8)));
+    connect(communication, SIGNAL(cmdReceived(quint8,quint8,quint8)), this, SLOT(getCmd(quint8,quint8,quint8)));
 }
 
 Parking::~Parking()

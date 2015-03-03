@@ -22,26 +22,29 @@ enum cmd_arduino
 class Parking : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString places READ getNbrePlaces NOTIFY nbrePlacesChanged)
+    Q_PROPERTY(quint8 places READ getNbrePlaces NOTIFY nbrePlacesChanged)
 
 public:
     explicit Parking(QObject *parent = 0);
     ~Parking();
 
-    QString getNbrePlaces();
+    quint8 getNbrePlaces();
 
 public slots:
-    void updateNbre();
     void connectedToParking();
+    void sendCmd(const quint8 cmd, const quint8 data1, const quint8 data2 = 0);
+    void getCmd(const quint8 cmd, const quint8 data1, const quint8 data2 = 0);
 
 Q_SIGNALS:
     void nbrePlacesChanged();
 
 private:
     QTimer *m_timer;
-    QString m_nbrePlaces;
-
+    quint8 m_nbrePlaces;
     Communication *communication;
+
+    void askUpdateNbrePlaces();
+    void updateNbrePlaces(const quint8 nbrePlaces);
 };
 
 #endif // PARKING_H

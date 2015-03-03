@@ -9,17 +9,10 @@ ApplicationWindow {
     height: 1280
     width: 720
 
-    Text {
-        id: nbrePlacesDisponibles
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-        x: parent.width / 2 -200
-        y: 100
+    Component.onCompleted: pageLoader.source = "view/MainView.qml"
 
-        font.pixelSize: 150
-        property string places: parking.places
-        onPlacesChanged: {
-            nbrePlacesDisponibles.text = places;
+        Loader {
+            id: pageLoader
+            anchors.fill: parent
         }
-    }
 }

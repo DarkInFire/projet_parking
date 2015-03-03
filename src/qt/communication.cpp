@@ -24,30 +24,17 @@ void Communication::connectionEtablished()
     qDebug() << "Communication::Communication";
 }
 
-void Communication::sendCmd(const quint8 cmd, const quint8 &data)
-{
-    /*
-    QByteArray dataTransmit;
-    dataTransmit[0] = cmd;
-    dataTransmit[1] = token;
-    dataTransmit[2] = data1;
-    dataTransmit[3] = data2;
-    stream->writeRawData(dataTransmit, 4);*/
-
-    qDebug() << "send cmd with data";
-}
-
-void Communication::sendCmd(const quint8 cmd)
+void Communication::sendCmd(const quint8 cmd, const quint8 data1, const quint8 data2)
 {
     QByteArray dataTransmit;
     dataTransmit.resize(4);
     dataTransmit[0] = cmd;
     dataTransmit[1] = token;
-    dataTransmit[2] = 127;
-    dataTransmit[3] = 127;
+    dataTransmit[2] = data1;
+    dataTransmit[3] = data2;
     stream->writeRawData(dataTransmit, 4);
 
-    qDebug() << "send cmd without data";
+    qDebug() << "send cmd";
 }
 
 void Communication::dataReceived()
@@ -73,13 +60,16 @@ void Communication::dataReceived()
     QByteArray buffer;
     buffer.resize(4);
     buffer = socket->read(4);
-    int cmd = buffer[0];
-    int token = buffer[1];
-    int msg1 = buffer[2];
-    int msg2 = buffer[3];
+    quint8 cmd = buffer[0];
+    quint8 token = buffer[1];
+    quint8 msg1 = buffer[2];
+    quint8 msg2 = buffer[3];
     qDebug()<< "cmd at 0: " << cmd;
     qDebug()<< "tok at 1: " << token;
     qDebug()<< "ms1 at 2: " << msg1;
     qDebug()<< "ms2 at 3: " << msg2;
     qDebug()<< "buffer.data: \"" << buffer.data()<< "\"";
+
+    emit cmdReceived(cmd, msg1, msg2);
 }
+
