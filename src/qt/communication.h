@@ -22,12 +22,14 @@ class Communication : public QObject
 public:
     explicit Communication(QObject *parent = 0, QBluetoothAddress parkingComAddress = QBluetoothAddress("00:13:EF:01:11:8B"));
     ~Communication();
+    
+    void getCmd(const int cmd, const quint8 data1, const quint data2 = 0);
 
 signals:
 
 public slots:
     //Envoie/Réception de données
-    void sendCmd(const quint8 cmd, const quint8 &data);
+    void sendCmd(const quint8 cmd, const quint8 data);
     void sendCmd(const quint8 cmd);
 
     //Slots Bluetooth
