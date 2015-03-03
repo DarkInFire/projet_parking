@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QDebug>
+#include <sstream>
 
 //Définie les valeurs du service Bluetooth
 static const QString serviceUuid(QStringLiteral("00001101-0000-1000-8000-00805F9B34FB"));
@@ -42,6 +43,7 @@ private:
     QDataStream *stream;
     quint8 token;
     bool correctPacket;
+    bool connectionInitialized;
 };
 
 #endif // COMMUNICATION_H

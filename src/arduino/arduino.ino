@@ -1,5 +1,6 @@
 #include <SoftwareSerial.h>   //Software Serial Port
 #include "utilisateur.h"
+#include <stdio.h>
 
 #define DEBUG_ENABLED  1
 #define RxD 6
@@ -104,7 +105,7 @@ void checkAndroidCommand()
     switch ( dataPacket.data[CMD] )
     {
     case cmd_getNbrPlacesDispo:
-      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
+      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 200);
 
       break;
 
@@ -128,19 +129,21 @@ void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t 
 {
   if (!androidConnected)
     return;
+  uint8_t buf[] = {messageId,androidToken,message1,message2};
   Serial.println("---ENVOI D'UN MESSAGE");
-  bluetoothSerial.print(messageId);
   Serial.print("ID Message: ");
   Serial.println(messageId);
-  bluetoothSerial.print(androidToken);
   Serial.print("Token: ");
   Serial.println(androidToken);
-  bluetoothSerial.print(message1);
   Serial.print("Message1: ");
   Serial.println(message1);
-  bluetoothSerial.print(message2);
   Serial.print("Message2: ");
   Serial.println(message2);
+  
+  bluetoothSerial.write(buf[0]);
+  bluetoothSerial.write(buf[1]);
+  bluetoothSerial.write(buf[2]);
+  bluetoothSerial.write(buf[3]);
 }
 
 void setupBluetoothConnection()
