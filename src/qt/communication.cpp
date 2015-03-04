@@ -5,6 +5,7 @@ Communication::Communication(QObject *parent, QBluetoothAddress parkingComAddres
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     socket->connectToService(parkingComAddress, QBluetoothUuid(serviceUuid), QIODevice::ReadWrite);
     connect(socket, SIGNAL(connected()), this, SLOT(connectionEtablished()));
+    connect(socket, SIGNAL(error(QBluetoothSocket::SocketError)), this, SIGNAL(connectionFailed(QBluetoothSocket::SocketError)));
 
     stream = new QDataStream(socket);
 

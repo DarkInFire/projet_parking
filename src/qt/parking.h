@@ -32,8 +32,12 @@ public:
 
 public slots:
     void connectedToParking();
-    void sendCmd(const quint8 cmd, const quint8 data1, const quint8 data2 = 0);
-    void getCmd(const quint8 cmd, const quint8 data1, const quint8 data2 = 0);
+    void sendCmd(const quint8 cmd, const quint8 data1 = 0, const quint8 data2 = 0);
+    void getCmd(const quint8 cmd, const quint8 data1 = 0, const quint8 data2 = 0);
+
+    void randUpdate();
+
+    void connectionFailed(QBluetoothSocket::SocketError id);
 
 Q_SIGNALS:
     void nbrePlacesChanged();

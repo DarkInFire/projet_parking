@@ -11,8 +11,8 @@ ApplicationWindow {
 
     Component.onCompleted: pageLoader.source = "view/MainView.qml"
 
-        Loader {
-            id: pageLoader
-            anchors.fill: parent
-        }
+    Loader {
+        id: pageLoader
+        anchors.fill: parent
+    }
 }
