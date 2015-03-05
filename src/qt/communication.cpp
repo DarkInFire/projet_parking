@@ -9,6 +9,8 @@ Communication::Communication(QObject *parent, QBluetoothAddress parkingComAddres
 
     stream = new QDataStream(socket);
 
+    connectionInitialized = false;
+
     qDebug() << "Communication::Communication";
 }
 
@@ -40,14 +42,28 @@ void Communication::sendCmd(const quint8 cmd, const quint8 data1, const quint8 d
 
 void Communication::dataReceived()
 {
-    qDebug()<< "Communication::dataReceived";
+    /*Lire une commande
+     *
+     * Vérifier si l'arduino est connecté
+     *
+     * Vérifier si des données sont dispo
+     *
+     * Lire 1 octet de donnée
+     *
+     * Si l'octet lu est égal à 255 (valeur de start)
+     *  Lire les 4 prochains octets (cmd, crc, msg1, msg2)
+     * SINON
+     *  Lire les 3 prochains octets, la valeur lue précedemment est la commande (crc, msg1, msg2)
+     *
+     * Vérifier que le token est 18
+     *
+     * Envoyer le signal cmdReceived
+     */
     if (!socket)
     {
         qDebug()<< "Communication::socketERREUR";
         return;
     }
-
-    qDebug()<< "Communication::socketOK";
 
     if (socket->bytesAvailable() < 1)
     {
@@ -55,22 +71,24 @@ void Communication::dataReceived()
         return;
     }
 
-    //Vérification des données
+    QByteArray buffer = socket->read(1);
 
-    qDebug()<<socket->bytesAvailable();
-    QByteArray buffer;
-    buffer.resize(4);
-    buffer = socket->read(4);
-    quint8 cmd = buffer[0];
-    quint8 token = buffer[1];
-    quint8 msg1 = buffer[2];
-    quint8 msg2 = buffer[3];
+    if (buffer[0] == 255)
+    {
+        buffer = socket->read(4);
+    }
+    else
+    {
+        buffer.append(socket->read(3));
+    }
+
+    emit cmdReceived(buffer[1], msg1, msg2);
+
+    qDebug()<< "start: " << start;
     qDebug()<< "cmd at 0: " << cmd;
     qDebug()<< "tok at 1: " << token;
     qDebug()<< "ms1 at 2: " << msg1;
     qDebug()<< "ms2 at 3: " << msg2;
-    qDebug()<< "buffer.data: \"" << buffer.data()<< "\"";
 
-    emit cmdReceived(cmd, msg1, msg2);
+    socket->readAll();
 }
-

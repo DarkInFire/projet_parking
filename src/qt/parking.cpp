@@ -17,7 +17,7 @@ Parking::~Parking()
 
 void Parking::connectedToParking()
 {
-    m_timer->start(2500);
+    m_timer->start(1000);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(askUpdateNbrePlaces()));
     qDebug() << "connectedToParking";
 }

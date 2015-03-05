@@ -31,13 +31,19 @@ public:
     quint8 getNbrePlaces();
 
 public slots:
+    //Bluetooth
     void connectedToParking();
+    void connectionFailed(QBluetoothSocket::SocketError id);
+
+    //Envoie/réception
     void sendCmd(const quint8 cmd, const quint8 data1 = 0, const quint8 data2 = 0);
     void getCmd(const quint8 cmd, const quint8 data1 = 0, const quint8 data2 = 0);
 
+    //Simulation
     void randUpdate();
 
-    void connectionFailed(QBluetoothSocket::SocketError id);
+    //Commandes
+    void askUpdateNbrePlaces();
 
 Q_SIGNALS:
     void nbrePlacesChanged();
@@ -47,7 +53,6 @@ private:
     quint8 m_nbrePlaces;
     Communication *communication;
 
-    void askUpdateNbrePlaces();
     void updateNbrePlaces(const quint8 nbrePlaces);
 };
 

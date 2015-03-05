@@ -15,7 +15,7 @@ const int baudRate = 9600;
 bool correctPacket = false;
 
 const int BUFFER_LIMIT = 4;
-
+ 
 byte nbrPlacesDispo;
 
 //Variables nécessaires à la communication Android;
@@ -44,8 +44,7 @@ struct
 {
   byte data[BUFFER_LIMIT]; //Données reçues
   byte curLoc; //compteur
-} 
-dataPacket; 
+} dataPacket; 
 
 void setup() 
 { 
@@ -69,6 +68,8 @@ void loop()
     Serial.println("Bluetooth Data available");
     checkAndroidCommand();
   }
+  
+  nbrPlacesDispo = random(1, 42);
 }
 
 void checkAndroidCommand()
@@ -105,8 +106,7 @@ void checkAndroidCommand()
     switch ( dataPacket.data[CMD] )
     {
     case cmd_getNbrPlacesDispo:
-      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 200);
-
+      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
       break;
 
     default:
@@ -129,7 +129,8 @@ void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t 
 {
   if (!androidConnected)
     return;
-  uint8_t buf[] = {messageId,androidToken,message1,message2};
+  byte buf[] = {255, messageId, androidToken, message1, message2};
+  
   Serial.println("---ENVOI D'UN MESSAGE");
   Serial.print("ID Message: ");
   Serial.println(messageId);
@@ -140,10 +141,7 @@ void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t 
   Serial.print("Message2: ");
   Serial.println(message2);
   
-  bluetoothSerial.write(buf[0]);
-  bluetoothSerial.write(buf[1]);
-  bluetoothSerial.write(buf[2]);
-  bluetoothSerial.write(buf[3]);
+  bluetoothSerial.write(buf, 5);
 }
 
 void setupBluetoothConnection()
