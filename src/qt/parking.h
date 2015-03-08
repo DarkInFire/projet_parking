@@ -10,13 +10,18 @@
 //Liste des messages recevables par la tablette
 enum msg_tablet
 {
-    msg_nbrPlacesDispo = 1, //Nombre de places disponibles
+    msg_nbrPlacesDispo = 1, //Nombre de places disponibles en data1
+    msg_carParkedAtPosition, //Si une voiture est garée à l'emplacement data1, data2 = 1
+    msg_etatParking, //Renvoie l'état du parking
+    msg_ready,
 };
 
 //Liste des commandes utilisables par l'arduino
 enum cmd_arduino
 {
     cmd_getNbrPlacesDispo = 1, //Demande du nombre de places disponibles
+    cmd_carParkedAtPosition, //Demande si une voiture est gérée à l'empalcement data1
+    cmd_getEtatParking, //Demande l'état du parking
 };
 
 class Parking : public QObject
@@ -45,15 +50,22 @@ public slots:
     //Commandes
     void askUpdateNbrePlaces();
 
-Q_SIGNALS:
-    void nbrePlacesChanged();
+signals:
+    void nbrePlacesUpdated();
+    void emplacementsUpdated();
 
 private:
     QTimer *m_timer;
-    quint8 m_nbrePlaces;
     Communication *communication;
 
+    quint8 m_emplacements[25][2];
+    quint8 m_nbrePlaces;
+    quint8 m_etatParking;
+
+    bool checkToken(const quint8 token);
+
     void updateNbrePlaces(const quint8 nbrePlaces);
+    void updateEmplacements(const quint8 position, const quint8 occupied);
 };
 
 #endif // PARKING_H

@@ -26,13 +26,17 @@ byte transmissionBytes[4];
 //liste des messages du protocole de communication
 enum COMMANDS {
   cmd_getNbrPlacesDispo = 1,
+  cmd_carParkedOnPosition,
+  cmd_getEtatParking,
 };
 
 enum MESSAGES {
   msg_NbrPlacesDispo = 1,
+  msg_carParkedOnPosition,
+  msg_etatParking
 };
 
-//Enumération du packet reçu
+//liste des infos d'un paquet
 enum PACKET_DETAILS{
   CMD = 0,
   TOKEN,
@@ -63,7 +67,7 @@ void setup()
 
 void loop() 
 {
-  if(bluetoothSerial.available() > 0)
+  if(bluetoothSerial.available() > 3)
   {
     Serial.println("Bluetooth Data available");
     checkAndroidCommand();
@@ -105,16 +109,18 @@ void checkAndroidCommand()
 
     switch ( dataPacket.data[CMD] )
     {
-    case cmd_getNbrPlacesDispo:
-      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
-      break;
+      case cmd_getNbrPlacesDispo:
+        sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
+        break;
+      case cmd_carParkedOnPosition:
+        
 
-    default:
-      //Si la commande est incorrecte
-      correctPacket = false;
-      dataPacket.curLoc = 0;
-      Serial.println("invalid cmd");
-      break;
+      default:
+        //Si la commande est incorrecte
+        correctPacket = false;
+        dataPacket.curLoc = 0;
+        Serial.println("invalid cmd");
+        break;
     }
 
     if (correctPacket == true )

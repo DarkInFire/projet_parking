@@ -24,6 +24,7 @@ void Communication::connectionEtablished()
     token = 18;
     emit connectedToParking();
     connect(socket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
+    connect(this, SIGNAL(dataInBuffer()), this, SLOT(dataReceived()));
     qDebug() << "Communication::Communication";
 }
 
@@ -42,23 +43,6 @@ void Communication::sendCmd(const quint8 cmd, const quint8 data1, const quint8 d
 
 void Communication::dataReceived()
 {
-    /*Lire une commande
-     *
-     * Vérifier si l'arduino est connecté
-     *
-     * Vérifier si des données sont dispo
-     *
-     * Lire 1 octet de donnée
-     *
-     * Si l'octet lu est égal à 255 (valeur de start)
-     *  Lire les 4 prochains octets (cmd, crc, msg1, msg2)
-     * SINON
-     *  Lire les 3 prochains octets, la valeur lue précedemment est la commande (crc, msg1, msg2)
-     *
-     * Vérifier que le token est 18
-     *
-     * Envoyer le signal cmdReceived
-     */
     if (!socket)
     {
         qDebug()<< "Communication::socketERREUR";
@@ -74,21 +58,20 @@ void Communication::dataReceived()
     QByteArray buffer = socket->read(1);
 
     if (buffer[0] == 255)
-    {
         buffer = socket->read(4);
-    }
     else
-    {
         buffer.append(socket->read(3));
-    }
 
-    emit cmdReceived(buffer[1], msg1, msg2);
+    if (!checkToken(buffer[1]))
+        return;
 
-    qDebug()<< "start: " << start;
-    qDebug()<< "cmd at 0: " << cmd;
-    qDebug()<< "tok at 1: " << token;
-    qDebug()<< "ms1 at 2: " << msg1;
-    qDebug()<< "ms2 at 3: " << msg2;
+    emit cmdReceived(buffer[0], buffer[2], buffer[3]);
 
-    socket->readAll();
+    if (socket->bytesAvailable() > 1)
+        emit dataInBuffer();
+}
+
+bool Communication::checkToken(const quint8 token)
+{
+    return (token == 18) ? true : false;
 }
