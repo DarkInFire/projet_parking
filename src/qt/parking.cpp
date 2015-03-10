@@ -61,6 +61,10 @@ void Parking::getCmd(const quint8 cmd, const quint8 data1, const quint8 data2)
         this->updateEmplacements(data1, data2);
         break;
 
+    case msg_etatParking:
+        this->updateEtatParking(data1);
+        break;
+
     default:
         qDebug()<<"Commande invalide";
         break;
@@ -94,3 +98,5 @@ void Parking::updateEmplacements(const quint8 position, const quint8 occupied)
     this->m_emplacements[position][1] = occupied;
     emit emplacementsUpdated();
 }
+
+void Parking::

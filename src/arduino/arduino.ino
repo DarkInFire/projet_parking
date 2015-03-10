@@ -1,61 +1,33 @@
 #include <SoftwareSerial.h>   //Software Serial Port
-#include "utilisateur.h"
 #include <stdio.h>
+#include <stdint.h>
+#include "utilisateur.h"
+#include "communicationandroid.h"
 
 #define DEBUG_ENABLED  1
 #define RxD 6
 #define TxD 7
 
+using namespace Android;
+
 SoftwareSerial bluetoothSerial(RxD,TxD);
 
-unsigned long lastTimerHit;
+uint8_t nbrPlacesDispo;
+
+int tableauEmplacements[23];
+
+uint8_t etatParking;
 
 const int baudRate = 9600;
 
-bool correctPacket = false;
-
-const int BUFFER_LIMIT = 4;
- 
-byte nbrPlacesDispo;
-
-//Variables nécessaires à la communication Android;
-byte androidToken;
-bool androidConnected = true;
-byte transmissionBytes[4];
-
-//liste des messages du protocole de communication
-enum COMMANDS {
-  cmd_getNbrPlacesDispo = 1,
-  cmd_carParkedOnPosition,
-  cmd_getEtatParking,
-};
-
-enum MESSAGES {
-  msg_NbrPlacesDispo = 1,
-  msg_carParkedOnPosition,
-  msg_etatParking
-};
-
-//liste des infos d'un paquet
-enum PACKET_DETAILS{
-  CMD = 0,
-  TOKEN,
-  DATA_1,
-  DATA_2,
-};
-
-struct
-{
-  byte data[BUFFER_LIMIT]; //Données reçues
-  byte curLoc; //compteur
-} dataPacket; 
+int i;
 
 void setup() 
 { 
   Serial.begin(baudRate);
   pinMode(RxD, INPUT);
   pinMode(TxD, OUTPUT);
-  setupBluetoothConnection();
+  Android::setupBluetoothConnection();
 
   lastTimerHit = 0;
   dataPacket.curLoc = 0;
@@ -63,6 +35,17 @@ void setup()
   nbrPlacesDispo = 5;
 
   androidToken = B10010;
+  
+  etatParking = 0;
+  
+  dataPacket.data[CMD] = 0;
+  dataPacket.data[DATA_1] = 0;
+  dataPacket.data[DATA_2] = 0;
+  
+  for(i=0;i<23;i++)
+  {
+	tableauEmplacements[i] = 0;
+  }
 } 
 
 void loop() 
@@ -107,21 +90,7 @@ void checkAndroidCommand()
     Serial.print("Message2: ");
     Serial.println(dataPacket.data[DATA_2]);
 
-    switch ( dataPacket.data[CMD] )
-    {
-      case cmd_getNbrPlacesDispo:
-        sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
-        break;
-      case cmd_carParkedOnPosition:
-        
-
-      default:
-        //Si la commande est incorrecte
-        correctPacket = false;
-        dataPacket.curLoc = 0;
-        Serial.println("invalid cmd");
-        break;
-    }
+    Android::handleCommand(dataPacket.data[CMD], dataPacket.data[DATA_1], dataPacket.data[DATA_2]);
 
     if (correctPacket == true )
     {
@@ -129,37 +98,4 @@ void checkAndroidCommand()
       correctPacket = false;
     }
   }
-}
-
-void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t message2)
-{
-  if (!androidConnected)
-    return;
-  byte buf[] = {255, messageId, androidToken, message1, message2};
-  
-  Serial.println("---ENVOI D'UN MESSAGE");
-  Serial.print("ID Message: ");
-  Serial.println(messageId);
-  Serial.print("Token: ");
-  Serial.println(androidToken);
-  Serial.print("Message1: ");
-  Serial.println(message1);
-  Serial.print("Message2: ");
-  Serial.println(message2);
-  
-  bluetoothSerial.write(buf, 5);
-}
-
-void setupBluetoothConnection()
-{
-  bluetoothSerial.begin(38400); //Set BluetoothBee BaudRate to default baud rate 38400
-  bluetoothSerial.print("\r\n+STWMOD=0\r\n"); //set the bluetooth work in slave mode
-  bluetoothSerial.print("\r\n+STNA=arduino_parking\r\n"); //set the bluetooth name as "SeeedBTSlave"
-  bluetoothSerial.print("\r\n+STOAUT=1\r\n"); // Permit Paired device to connect me
-  bluetoothSerial.print("\r\n+STAUTO=0\r\n"); // Auto-connection should be forbidden here
-  delay(2000); // This delay is required.
-  bluetoothSerial.print("\r\n+INQ=1\r\n"); //make the slave bluetooth inquirable 
-  Serial.println("bluetooth ok ");
-  delay(2000); // This delay is required.
-  bluetoothSerial.flush();
 }

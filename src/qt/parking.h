@@ -58,7 +58,7 @@ private:
     QTimer *m_timer;
     Communication *communication;
 
-    quint8 m_emplacements[25][2];
+    quint8 m_emplacements[2];
     quint8 m_nbrePlaces;
     quint8 m_etatParking;
 
@@ -66,6 +66,7 @@ private:
 
     void updateNbrePlaces(const quint8 nbrePlaces);
     void updateEmplacements(const quint8 position, const quint8 occupied);
+    void updateEtatParking(const quint8 etatParking);
 };
 
 #endif // PARKING_H
