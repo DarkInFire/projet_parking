@@ -1,6 +1,5 @@
 namespace Android
 {
-typedef unsigned char uint8_t; 
   void handleCommand(const uint8_t cmd, const uint8_t data1, const uint8_t data2)
   {
     switch ( cmd )
@@ -25,7 +24,7 @@ typedef unsigned char uint8_t;
       }
   }
 
-  Android::void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t message2)
+  void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t message2)
   {
     if (!androidConnected)
       return;
@@ -44,7 +43,7 @@ typedef unsigned char uint8_t;
     bluetoothSerial.write(buf, 5);
   }
 
-  Android::void setupBluetoothConnection()
+ void setupBluetoothConnection()
   {
     bluetoothSerial.begin(38400); //Set BluetoothBee BaudRate to default baud rate 38400
     bluetoothSerial.print("\r\n+STWMOD=0\r\n"); //set the bluetooth work in slave mode

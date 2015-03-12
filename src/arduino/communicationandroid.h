@@ -7,7 +7,7 @@ unsigned long lastTimerHit;
 bool correctPacket;
 const int BUFFER_LIMIT = 4;
 
-//Variables nécessaires à la communication Android;
+//Variables nÃ©cessaires Ã  la communication Android;
 uint8_t androidToken;
 bool androidConnected;
 uint8_t transmissionBytes[4];
@@ -39,7 +39,7 @@ namespace Android
   
   struct
   {
-    uint8_t data[BUFFER_LIMIT]; //Données reçues
+    uint8_t data[BUFFER_LIMIT]; //DonnÃ©es reÃ§ues
     uint8_t curLoc; //compteur
   } dataPacket;
 
