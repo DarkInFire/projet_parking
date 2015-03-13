@@ -11,7 +11,6 @@
 //Définie les valeurs du service Bluetooth
 static const QString serviceUuid(QStringLiteral("00001101-0000-1000-8000-00805F9B34FB"));
 
-
 /*
  * Classe communication
  * Gère les entrés/sorties de la tablette
@@ -31,6 +30,7 @@ public slots:
     void connectionEtablished();
     void dataReceived();
 
+
 signals:
     void connectedToParking();
     void connectionFailed(QBluetoothSocket::SocketError);
@@ -48,6 +48,9 @@ private:
     bool connectionInitialized;
 
     bool checkToken(const quint8 token);
+    void checkCommectionInitialize(const QByteArray data);
+    void readData(const QByteArray firstByte);
+    void invalidData();
 };
 
 #endif // COMMUNICATION_H

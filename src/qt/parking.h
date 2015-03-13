@@ -22,18 +22,19 @@ enum cmd_arduino
     cmd_getNbrPlacesDispo = 1, //Demande du nombre de places disponibles
     cmd_carParkedAtPosition, //Demande si une voiture est gérée à l'empalcement data1
     cmd_getEtatParking, //Demande l'état du parking
+    cmd_invalidData,
 };
 
 class Parking : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(quint8 places READ getNbrePlaces NOTIFY nbrePlacesChanged)
+    Q_PROPERTY(quint8 nbrPlaces READ nbrPlaces NOTIFY nbrePlacesChanged)
 
 public:
     explicit Parking(QObject *parent = 0);
     ~Parking();
 
-    quint8 getNbrePlaces();
+    Q_INVOKABLE quint8 nbrPlaces();
 
 public slots:
     //Bluetooth
@@ -50,9 +51,9 @@ public slots:
     //Commandes
     void askUpdateNbrePlaces();
 
-signals:
-    void nbrePlacesUpdated();
+Q_SIGNALS:
     void emplacementsUpdated();
+    void nbrePlacesChanged();
 
 private:
     QTimer *m_timer;

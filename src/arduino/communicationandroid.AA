@@ -1,3 +1,5 @@
+#include "communicationandroid.h"
+
 namespace Android
 {
   void handleCommand(const uint8_t cmd, const uint8_t data1, const uint8_t data2)
@@ -19,7 +21,6 @@ namespace Android
           //Si la commande est incorrecte
           correctPacket = false;
           dataPacket.curLoc = 0;
-          Serial.println("invalid cmd");
           break;
       }
   }
@@ -28,17 +29,7 @@ namespace Android
   {
     if (!androidConnected)
       return;
-    byte buf[] = {255, messageId, androidToken, message1, message2};
-    
-    Serial.println("---ENVOI D'UN MESSAGE");
-    Serial.print("ID Message: ");
-    Serial.println(messageId);
-    Serial.print("Token: ");
-    Serial.println(androidToken);
-    Serial.print("Message1: ");
-    Serial.println(message1);
-    Serial.print("Message2: ");
-    Serial.println(message2);
+    uint8_t buf[] = {255, messageId, androidToken, message1, message2};
     
     bluetoothSerial.write(buf, 5);
   }
@@ -52,7 +43,6 @@ namespace Android
     bluetoothSerial.print("\r\n+STAUTO=0\r\n"); // Auto-connection should be forbidden here
     delay(2000); // This delay is required.
     bluetoothSerial.print("\r\n+INQ=1\r\n"); //make the slave bluetooth inquirable 
-    Serial.println("bluetooth ok ");
     delay(2000); // This delay is required.
     bluetoothSerial.flush();
   }

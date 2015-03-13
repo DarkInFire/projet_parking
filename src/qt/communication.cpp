@@ -24,7 +24,6 @@ void Communication::connectionEtablished()
     token = 18;
     emit connectedToParking();
     connect(socket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
-    connect(this, SIGNAL(dataInBuffer()), this, SLOT(dataReceived()));
     qDebug() << "Communication::Communication";
 }
 
@@ -41,8 +40,15 @@ void Communication::sendCmd(const quint8 cmd, const quint8 data1, const quint8 d
     qDebug() << "send cmd";
 }
 
+void Communication::invalidData()
+{
+    socket->readAll();
+    sendCmd(4);
+}
+
 void Communication::dataReceived()
 {
+    qDebug()<< "dataReceived";
     if (!socket)
     {
         qDebug()<< "Communication::socketERREUR";
@@ -55,20 +61,50 @@ void Communication::dataReceived()
         return;
     }
 
-    QByteArray buffer = socket->read(1);
+    readData(socket->read(1));
+}
+
+void Communication::readData(const QByteArray firstByte)
+{
+    qDebug() << "readData";
+
+    QByteArray buffer = firstByte;
 
     if (buffer[0] == 255)
         buffer = socket->read(4);
     else
         buffer.append(socket->read(3));
 
-    if (!checkToken(buffer[1]))
+    quint8 cmd = buffer[0];
+    quint8 token = buffer[1];
+    quint8 msg1 = buffer[2];
+    quint8 msg2 = buffer[3];
+
+    qDebug() << "buffer[0]: " << cmd << "buffer[1]: " << token << "buffer[2]: " << msg1 << "buffer[3]: " << msg2;
+
+    if (!checkToken(token))
+    {
+        qDebug() << "bad token";
+        invalidData();
         return;
+    }
 
-    emit cmdReceived(buffer[0], buffer[2], buffer[3]);
+    emit cmdReceived(cmd, msg1, msg2);
+}
 
-    if (socket->bytesAvailable() > 1)
-        emit dataInBuffer();
+void Communication::checkCommectionInitialize(const QByteArray data)
+{
+    quint8 byte1 = data[0];
+    quint8 byte2 = data[1];
+
+    if (byte1 == 255 && byte2 == 255)
+    {
+        qDebug() << "Connection initialisé";
+        this->connectionInitialized = true;
+        sendCmd(255);
+    }
+
+    socket->readAll();
 }
 
 bool Communication::checkToken(const quint8 token)

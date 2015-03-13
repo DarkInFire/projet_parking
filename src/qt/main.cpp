@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQmlEngine>
+#include <QQuickItem>
 #include "parking.h"
 
 int main(int argc, char *argv[])

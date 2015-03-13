@@ -1,20 +1,19 @@
 #ifndef COMMUNICATIONANDROID
 #define COMMUNICATIONANDROID
 
-#include <stdint.h>
-
-unsigned long lastTimerHit;
-bool correctPacket;
-const int BUFFER_LIMIT = 4;
-
-//Variables nécessaires à la communication Android;
-uint8_t androidToken;
-bool androidConnected;
-uint8_t transmissionBytes[4];
+#include "variables.h"
+#include "Arduino.h"
 
 namespace Android
 {
-  typedef unsigned char uint8_t; 
+  unsigned long lastTimerHit;
+  bool correctPacket;
+  const int BUFFER_LIMIT = 4;
+
+  //Variables nécessaires à la communication Android;
+  uint8_t androidToken;
+  bool androidConnected;
+  uint8_t transmissionBytes[4];
   
   //liste des messages du protocole de communication
   enum COMMANDS {
@@ -43,9 +42,9 @@ namespace Android
     uint8_t curLoc; //compteur
   } dataPacket;
 
-  static void handleCommand(const uint8_t cmd, const uint8_t data1 = 0, const uint8_t data2 = 0);
-  static void setupBluetoothConnection();
+  void handleCommand(const uint8_t cmd, const uint8_t data1 = 0, const uint8_t data2 = 0);
+  void setupBluetoothConnection();
 
-  static void sendMessage(const uint8_t messageId, const uint8_t message1 = 0, const uint8_t message2 = 0);
+  void sendMessage(const uint8_t messageId, const uint8_t message1 = 0, const uint8_t message2 = 0);
 };
 #endif

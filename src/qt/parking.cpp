@@ -8,6 +8,8 @@ Parking::Parking(QObject *parent) : QObject(parent)
     connect(communication, SIGNAL(connectedToParking()), this, SLOT(connectedToParking()));
     connect(communication, SIGNAL(connectionFailed(QBluetoothSocket::SocketError)), this, SLOT(connectionFailed(QBluetoothSocket::SocketError)));
     connect(communication, SIGNAL(cmdReceived(quint8,quint8,quint8)), this, SLOT(getCmd(quint8,quint8,quint8)));
+
+    this->m_nbrePlaces = 20;
 }
 
 Parking::~Parking()
@@ -22,11 +24,13 @@ void Parking::connectedToParking()
     sendCmd(cmd_getEtatParking);
 
     //Mise à jour du tableau des emplacements
+    /*
     int i;
     for(i=1; i<24; i++)
     {
         sendCmd(cmd_carParkedAtPosition, i);
     }
+    */
 
     qDebug() << "connectedToParking";
 }
@@ -51,6 +55,7 @@ void Parking::sendCmd(const quint8 cmd, const quint8 data1, const quint8 data2)
 
 void Parking::getCmd(const quint8 cmd, const quint8 data1, const quint8 data2)
 {
+    qDebug() << "cmdreceived" << cmd;
     switch (cmd)
     {
     case msg_nbrPlacesDispo:
@@ -81,12 +86,16 @@ void Parking::askUpdateNbrePlaces()
 void Parking::updateNbrePlaces(const quint8 nbrePlaces)
 {
     this->m_nbrePlaces = nbrePlaces;
-    emit nbrePlacesUpdated();
+
+    qDebug() << this->m_nbrePlaces;
+
+    emit nbrePlacesChanged();
 }
 
-quint8 Parking::getNbrePlaces()
+quint8 Parking::nbrPlaces()
 {
-    return m_nbrePlaces;
+    qDebug() << "nbrPlaces";
+    return this->m_nbrePlaces;
 }
 
 //Gestion du tableau m_emplacements
@@ -95,8 +104,11 @@ void Parking::updateEmplacements(const quint8 position, const quint8 occupied)
     if (position == 0 || position > 23 || occupied > 1)
         return;
 
-    this->m_emplacements[position][1] = occupied;
+    //this->m_emplacements[position][1] = occupied;
     emit emplacementsUpdated();
 }
 
-void Parking::
+void Parking::updateEtatParking(const quint8 etatParking)
+{
+    this->m_etatParking = etatParking;
+}

@@ -2,8 +2,6 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.0
 
 Item {
-    width: 1280
-    height: 720
     Rectangle {
         id: rectangle1
         gradient: Gradient {
@@ -36,19 +34,22 @@ Item {
         font.pixelSize: 111
     }
 
+    property int places: parking.nbrPlaces
+
+    onPlacesChanged: {
+        text_nbrePlacesDisponibles.text = places;
+        console.log(places);
+        }
+
     Text {
         id: text_nbrePlacesDisponibles
         x: 8
         y: 13
-        text: qsTr("20")
+        text: places
         width: 200
         horizontalAlignment: Text.AlignRight
         font.pixelSize: 148
     }
 
-    property string places: parking.places
 
-    onPlacesChanged: {
-        text_nbrePlacesDisponibles.text = places;
-        }
 }
