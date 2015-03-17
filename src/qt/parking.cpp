@@ -104,7 +104,7 @@ void Parking::updateEmplacements(const quint8 position, const quint8 occupied)
     if (position == 0 || position > 23 || occupied > 1)
         return;
 
-    //this->m_emplacements[position][1] = occupied;
+    this->m_emplacements[position] = occupied;
     emit emplacementsUpdated();
 }
 

@@ -2,26 +2,12 @@ import QtQuick 2.4
 import QtQuick.Layouts 1.0
 
 Item {
-    Rectangle {
+    Image {
         id: rectangle1
-        gradient: Gradient {
-            GradientStop {
-                position: 0
-                color: "#56e466"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#a3c9a8"
-            }
-
-            GradientStop {
-                position: 2
-                color: "#a354a8"
-            }
-        }
-        z: -1
         anchors.fill: parent
+           source: "parking.jpg"
+           sourceSize.width: 1280
+           sourceSize.height: 720
     }
 
     Text {
@@ -50,6 +36,4 @@ Item {
         horizontalAlignment: Text.AlignRight
         font.pixelSize: 148
     }
-
-
 }

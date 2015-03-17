@@ -80,7 +80,7 @@ void setup()
     tableauEmplacements[i] = 0;
   }
   
-  FlexiTimer2::set(2500, updateNbrePlaces); // 500ms period
+  FlexiTimer2::set(1000, updateNbrePlaces); // 500ms period
   FlexiTimer2::start();
   Serial.print("initialisé");
 }
@@ -169,14 +169,13 @@ void loop()
     Serial.println("Bluetooth Data available");
     checkAndroidCommand();
   }
-  
 }
 
 //QUAND LE NOMBRE DE PLACES CHANGE
 void updateNbrePlaces()
 {
   Serial.println("updateNbrePlaces");
-  nbrPlacesDispo = random(1, 42);
+  nbrPlacesDispo = random(1, 15);
   sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo);
 }
 

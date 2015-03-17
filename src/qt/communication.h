@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <QDebug>
+#include <QTimer>
 #include <sstream>
 
 //Définie les valeurs du service Bluetooth
@@ -30,7 +31,6 @@ public slots:
     void connectionEtablished();
     void dataReceived();
 
-
 signals:
     void connectedToParking();
     void connectionFailed(QBluetoothSocket::SocketError);
@@ -44,6 +44,8 @@ private:
     QBluetoothAddress parkingComAdress;
     QDataStream *stream;
     quint8 token;
+    QByteArray bufferCmd[50][4];
+    QTimer *m_timer;
     bool correctPacket;
     bool connectionInitialized;
 
@@ -51,6 +53,9 @@ private:
     void checkCommectionInitialize(const QByteArray data);
     void readData(const QByteArray firstByte);
     void invalidData();
+
+    void addCmdToBuffer(const quint8 cmd, const quint8 data1, const quint8 data2);
+    void sendCmdFromBuffer();
 };
 
 #endif // COMMUNICATION_H

@@ -2,6 +2,8 @@
 
 Communication::Communication(QObject *parent, QBluetoothAddress parkingComAddress) : QObject(parent)
 {
+    m_timer = new QTimer(this);
+
     socket = new QBluetoothSocket(QBluetoothServiceInfo::RfcommProtocol);
     socket->connectToService(parkingComAddress, QBluetoothUuid(serviceUuid), QIODevice::ReadWrite);
     connect(socket, SIGNAL(connected()), this, SLOT(connectionEtablished()));
@@ -12,6 +14,7 @@ Communication::Communication(QObject *parent, QBluetoothAddress parkingComAddres
     connectionInitialized = false;
 
     qDebug() << "Communication::Communication";
+
 }
 
 Communication::~Communication()
@@ -22,9 +25,20 @@ Communication::~Communication()
 void Communication::connectionEtablished()
 {
     token = 18;
-    emit connectedToParking();
     connect(socket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
+    m_timer->start(1000);
     qDebug() << "Communication::Communication";
+    emit connectedToParking();
+}
+
+void Communication::addCmdToBuffer(const quint8 cmd, const quint8 data1, const quint8 data2)
+{
+    //Ajoute la dernière commande reçu à la fin du buffer
+}
+
+void Communication::sendCmdFromBuffer()
+{
+    //Lit la première donnée du buffer et l'envoie à l'arduino
 }
 
 void Communication::sendCmd(const quint8 cmd, const quint8 data1, const quint8 data2)
@@ -58,6 +72,7 @@ void Communication::dataReceived()
     if (socket->bytesAvailable() < 1)
     {
         qDebug()<< "No DATA available";
+        invalidData();
         return;
     }
 
@@ -89,6 +104,7 @@ void Communication::readData(const QByteArray firstByte)
         return;
     }
 
+    qDebug() << "cmdReceived";
     emit cmdReceived(cmd, msg1, msg2);
 }
 

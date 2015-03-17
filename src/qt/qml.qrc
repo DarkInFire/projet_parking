@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>view/MainView.qml</file>
+        <file>view/parking.jpg</file>
     </qresource>
 </RCC>
