@@ -20,7 +20,7 @@ class Communication : public QObject
 {
     Q_OBJECT
 public:
-    explicit Communication(QObject *parent = 0, QBluetoothAddress parkingComAddress = QBluetoothAddress("00:13:EF:01:11:8B"));
+    explicit Communication(QObject *parent = 0, QBluetoothAddress parkingComAddress = QBluetoothAddress("00:13:EF:01:13:21"));
     ~Communication();
 
 public slots:

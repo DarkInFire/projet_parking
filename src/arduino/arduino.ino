@@ -1,17 +1,13 @@
-#include <SoftwareSerial.h> 
+#include <SoftwareSerial.h>
 #include <FlexiTimer2.h>
-#define DEBUG_ENABLED 1
-#define RxD 6
-#define TxD 7
 
-#include "utilisateur.h"
-
-int i;
+/* --- Fonctionnement interne --- */
 
 uint8_t etatParking;
 uint8_t nbrPlacesDispo;
-int tableauEmplacements[23];
+int tableauEmplacements[15];
 
+/* --- Communication Android --- */
 uint8_t androidToken;
 bool androidConnected;
 uint8_t transmissionBytes[5];
@@ -21,8 +17,13 @@ bool correctPacket;
 const int BUFFER_LIMIT = 4;
 
 const int baudRate = 9600;
+#define DEBUG_ENABLED 1
+#define RxD 6
+#define TxD 7
 
-SoftwareSerial bluetoothSerial(RxD,TxD);
+int i;
+
+SoftwareSerial bluetoothSerial(RxD, TxD);
 
 void updateNbrePlaces();
 
@@ -42,7 +43,7 @@ enum MESSAGES {
 };
 
 //liste des infos d'un paquet
-enum PACKET_DETAILS{
+enum PACKET_DETAILS {
   CMD = 0,
   TOKEN,
   DATA_1,
@@ -55,18 +56,18 @@ struct
   uint8_t curLoc; //compteur
 } dataPacket;
 
-void setup() 
-{ 
+void setup()
+{
   Serial.begin(baudRate);
-  
+
   pinMode(RxD, INPUT);
   pinMode(TxD, OUTPUT);
   setupBluetoothConnection();
 
-  nbrPlacesDispo = 5;
-  
+  nbrPlacesDispo = 6;
+
   etatParking = 0;
-  
+
   dataPacket.data[CMD] = 0;
   dataPacket.data[DATA_1] = 0;
   dataPacket.data[DATA_2] = 0;
@@ -74,12 +75,12 @@ void setup()
   lastTimerHit = 0;
   dataPacket.curLoc = 0;
   androidConnected = false;
-  
-  for(i=0;i<23;i++)
+
+  for (i = 0; i < 15; i++)
   {
     tableauEmplacements[i] = 0;
   }
-  
+
   FlexiTimer2::set(1000, updateNbrePlaces); // 500ms period
   FlexiTimer2::start();
   Serial.print("initialisé");
@@ -89,20 +90,20 @@ void setup()
 void sendMessage(const uint8_t messageId, const uint8_t message1 = 0, const uint8_t message2 = 0)
 {
   Serial.println("sendMessage");
-  
+
   if (messageId == msg_resend)
   {
     bluetoothSerial.write(transmissionBytes, 5);
     bluetoothSerial.flush();
     return;
   }
-  
+
   transmissionBytes[0] = 255;
   transmissionBytes[1] = messageId;
   transmissionBytes[2] = androidToken;
   transmissionBytes[3] = message1;
   transmissionBytes[4] = message2;
-  
+
   Serial.print(255);
   Serial.print(messageId);
   Serial.print(androidToken);
@@ -117,35 +118,35 @@ void handleCommand(const uint8_t cmd, const uint8_t data1 = 0, const uint8_t dat
 {
   Serial.println("handleCommand");
   switch ( cmd )
-    {
-      case cmd_getNbrPlacesDispo:
-        sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
-        break;
-      case cmd_carParkedOnPosition:
-        sendMessage(msg_carParkedOnPosition, data1, tableauEmplacements[data1]);
-        break;
-    
-      case cmd_getEtatParking:
-        sendMessage(msg_etatParking, etatParking);
-        break;
-        
-      case cmd_invalidMsg:
-        sendMessage(msg_resend);
-        break;
-        
-      case 255:
-        androidConnected = true;
-        Serial.print("androidConnected");
-        break;
+  {
+    case cmd_getNbrPlacesDispo:
+      sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo, 0);
+      break;
+    case cmd_carParkedOnPosition:
+      sendMessage(msg_carParkedOnPosition, data1, tableauEmplacements[data1]);
+      break;
 
-      default:
-        //Si la commande est incorrecte
-        correctPacket = false;
-        dataPacket.curLoc = 0;
-        while(Serial.available())
-          Serial.read();
-        break;
-    }
+    case cmd_getEtatParking:
+      sendMessage(msg_etatParking, etatParking);
+      break;
+
+    case cmd_invalidMsg:
+      sendMessage(msg_resend);
+      break;
+
+    case 255:
+      androidConnected = true;
+      Serial.print("androidConnected");
+      break;
+
+    default:
+      //Si la commande est incorrecte
+      correctPacket = false;
+      dataPacket.curLoc = 0;
+      while (Serial.available())
+        Serial.read();
+      break;
+  }
 }
 
 void setupBluetoothConnection()
@@ -156,15 +157,15 @@ void setupBluetoothConnection()
   bluetoothSerial.print("\r\n+STOAUT=1\r\n"); // Permit Paired device to connect me
   bluetoothSerial.print("\r\n+STAUTO=0\r\n"); // Auto-connection should be forbidden here
   delay(2000); // This delay is required.
-  bluetoothSerial.print("\r\n+INQ=1\r\n"); //make the slave bluetooth inquirable 
+  bluetoothSerial.print("\r\n+INQ=1\r\n"); //make the slave bluetooth inquirable
   Serial.print("Bluetooth OK");
   delay(2000); // This delay is required.
   bluetoothSerial.flush();
 }
 
-void loop() 
+void loop()
 {
-  if(bluetoothSerial.available() > 3)
+  if (bluetoothSerial.available() > 3)
   {
     Serial.println("Bluetooth Data available");
     checkAndroidCommand();
@@ -175,13 +176,20 @@ void loop()
 void updateNbrePlaces()
 {
   Serial.println("updateNbrePlaces");
-  nbrPlacesDispo = random(1, 15);
-  sendMessage(msg_NbrPlacesDispo, nbrPlacesDispo);
+
+  i = random(0, 15);
+
+  tableauEmplacements[i] =  random(0, 2);
+  Serial.println("i");
+  Serial.println(i);
+  Serial.println(tableauEmplacements[i]);
+
+  sendMessage(msg_carParkedOnPosition, i, tableauEmplacements[i]);
 }
 
 void checkAndroidCommand()
 {
-  
+
   /* Si plus de 500 ms entre la réception de bytes, réception annulée */
   if ( (lastTimerHit + 500) < millis() )
   {
@@ -197,7 +205,7 @@ void checkAndroidCommand()
   dataPacket.curLoc++; // Incrémentation du compteur
 
   if ( dataPacket.curLoc == BUFFER_LIMIT )
-  { 
+  {
     correctPacket = true;
     dataPacket.curLoc = 0;
 

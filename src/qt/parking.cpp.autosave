@@ -205,7 +205,9 @@ quint8 Parking::calcNbrePlaces()
         }
         qDebug() << this->m_emplacements[i];
     }
-
+    
+    qDebug() << "NOMBRE DE PLACES CALCNBRPLACES :";
+    qDebug() << nbr_places;
     return nbr_places;
 
 }
