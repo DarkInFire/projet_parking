@@ -29,6 +29,7 @@ class Parking : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(quint8 nbrPlaces READ nbrPlaces NOTIFY nbrePlacesChanged)
+    Q_PROPERTY(bool connected READ connectedOrNot NOTIFY connectedChange)
     Q_PROPERTY(bool place1 READ place1 NOTIFY nbrePlacesChanged)
     Q_PROPERTY(bool place2 READ place2 NOTIFY nbrePlacesChanged)
     Q_PROPERTY(bool place3 READ place3 NOTIFY nbrePlacesChanged)
@@ -50,7 +51,8 @@ public:
     ~Parking();
 
     Q_INVOKABLE quint8 nbrPlaces();
-	Q_INVOKABLE bool place1();
+    Q_INVOKABLE bool connected();
+    Q_INVOKABLE bool place1();
 	Q_INVOKABLE bool place2();
 	Q_INVOKABLE bool place3();
 	Q_INVOKABLE bool place4();
@@ -84,10 +86,13 @@ public slots:
 Q_SIGNALS:
     void emplacementsUpdated();
     void nbrePlacesChanged();
+    void connectedChange();
 
 private:
     QTimer *m_timer;
     Communication *communication;
+
+    bool connectedOrNot;
 
     bool m_emplacements[15];
     quint8 m_nbrePlaces;

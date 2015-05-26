@@ -1,11 +1,4 @@
 #include <SoftwareSerial.h>
-#include <FlexiTimer2.h>
-
-/* --- Fonctionnement interne --- */
-
-uint8_t etatParking;
-uint8_t nbrPlacesDispo;
-int tableauEmplacements[15];
 
 /* --- Communication Android --- */
 uint8_t androidToken;
@@ -58,15 +51,10 @@ struct
 
 void setup()
 {
-  Serial.begin(baudRate);
 
   pinMode(RxD, INPUT);
   pinMode(TxD, OUTPUT);
   setupBluetoothConnection();
-
-  nbrPlacesDispo = 6;
-
-  etatParking = 0;
 
   dataPacket.data[CMD] = 0;
   dataPacket.data[DATA_1] = 0;
@@ -76,13 +64,7 @@ void setup()
   dataPacket.curLoc = 0;
   androidConnected = false;
 
-  for (i = 0; i < 15; i++)
-  {
-    tableauEmplacements[i] = 0;
-  }
 
-  FlexiTimer2::set(1000, updateNbrePlaces); // 500ms period
-  FlexiTimer2::start();
   Serial.print("initialisé");
 }
 

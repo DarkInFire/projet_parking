@@ -16,6 +16,8 @@ Parking::Parking(QObject *parent) : QObject(parent)
     }
 
     this->m_nbrePlaces = calcNbrePlaces();
+
+    connectedOrNot = false;
 }
 
 Parking::~Parking()
@@ -28,6 +30,11 @@ void Parking::connectedToParking()
     //Initialisation du parking et synchronisation des données
     askUpdateNbrePlaces();
     sendCmd(cmd_getEtatParking);
+
+    connectedOrNot = true;
+
+    emit connectedChange();
+
 
     qDebug() << "connectedToParking";
 }
@@ -206,6 +213,8 @@ quint8 Parking::calcNbrePlaces()
         qDebug() << this->m_emplacements[i];
     }
 
+    qDebug() << "NOMBRE DE PLACES CALCNBRPLACES :";
+    qDebug() << nbr_places;
     return nbr_places;
 
 }

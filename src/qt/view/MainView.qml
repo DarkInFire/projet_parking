@@ -26,6 +26,7 @@ Item {
     }
 
     property int places: parking.nbrPlaces
+    property bool connected: parking.connected
 
     property bool place1: parking.place1
     property bool place2: parking.place2
@@ -139,6 +140,10 @@ Item {
         console.log(place13);
         console.log(place14);
         console.log(place15);
+    }
+
+    onConnectedChanged: {
+        rectangle1.color="#545454";
     }
 
     Text {
