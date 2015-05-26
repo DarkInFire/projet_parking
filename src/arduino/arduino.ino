@@ -19,6 +19,14 @@ int i;
 SoftwareSerial bluetoothSerial(RxD, TxD);
 
 void updateNbrePlaces();
+void sendMessage(const uint8_t messageId, const uint8_t message1 = 0, const uint8_t message2 = 0);
+void handleCommand(const uint8_t cmd, const uint8_t data1 = 0, const uint8_t data2 = 0);
+
+/*
+Ajout/retrait d'une voiture
+
+sendMessage(msg_carParkedOnPosition, AndroidToken, !!numero de la place dans une variable!!, tableaudesempalcementsdalois[numerodelaplace]);
+*/
 
 //liste des messages du protocole de communication
 enum COMMANDS {
@@ -69,7 +77,7 @@ void setup()
 }
 
 /* ------------ GESTION ANDROID ----------------- */
-void sendMessage(const uint8_t messageId, const uint8_t message1 = 0, const uint8_t message2 = 0)
+void sendMessage(const uint8_t messageId, const uint8_t message1, const uint8_t message2)
 {
   Serial.println("sendMessage");
 
@@ -96,7 +104,7 @@ void sendMessage(const uint8_t messageId, const uint8_t message1 = 0, const uint
   bluetoothSerial.flush();
 }
 
-void handleCommand(const uint8_t cmd, const uint8_t data1 = 0, const uint8_t data2 = 0)
+void handleCommand(const uint8_t cmd, const uint8_t data1, const uint8_t data2)
 {
   Serial.println("handleCommand");
   switch ( cmd )
